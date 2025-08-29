@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Clock, AlertTriangle, CheckCircle, Eye, MessageSquare } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const mockReports = [
   {
@@ -57,6 +58,35 @@ const getStatusColor = (status: string) => {
 };
 
 const Dashboard = () => {
+  const { toast } = useToast();
+
+  const handleViewDetails = (report: any) => {
+    toast({
+      title: `Report Details: ${report.type}`,
+      description: `Location: ${report.location} | Status: ${report.status} | Reporter: ${report.reporter}`,
+    });
+  };
+
+  const handleContact = (report: any) => {
+    toast({
+      title: "Contact Reporter",
+      description: `Connecting you with ${report.reporter}...`,
+    });
+  };
+
+  const handleVerify = (report: any) => {
+    toast({
+      title: "Report Verified",
+      description: `${report.type} report at ${report.location} has been verified.`,
+    });
+  };
+
+  const handleViewMap = () => {
+    toast({
+      title: "Map View",
+      description: "Opening interactive map view of all incidents...",
+    });
+  };
   return (
     <section id="dashboard" className="py-16 bg-background">
       <div className="container mx-auto px-4">
@@ -104,7 +134,7 @@ const Dashboard = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold">Latest Incident Reports</h3>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleViewMap}>
               <MapPin className="w-4 h-4 mr-2" />
               View Map
             </Button>
@@ -154,16 +184,16 @@ const Dashboard = () => {
                     </div>
                     
                     <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => handleViewDetails(report)}>
                         <Eye className="w-4 h-4 mr-1" />
                         View Details
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => handleContact(report)}>
                         <MessageSquare className="w-4 h-4 mr-1" />
                         Contact
                       </Button>
                       {report.status === "pending" && (
-                        <Button size="sm" className="bg-gradient-ocean">
+                        <Button size="sm" className="bg-gradient-ocean" onClick={() => handleVerify(report)}>
                           <CheckCircle className="w-4 h-4 mr-1" />
                           Verify
                         </Button>
