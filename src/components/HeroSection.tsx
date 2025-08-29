@@ -37,6 +37,12 @@ const HeroSection = () => {
             <Button 
               size="lg" 
               className="bg-gradient-ocean hover:shadow-glow transition-all duration-300 transform hover:scale-105"
+              onClick={() => {
+                const element = document.getElementById('report-form');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
             >
               <Camera className="h-5 w-5 mr-2" />
               Report Incident Now
@@ -45,6 +51,12 @@ const HeroSection = () => {
               variant="outline" 
               size="lg"
               className="border-2 hover:bg-card/80 backdrop-blur"
+              onClick={() => {
+                const element = document.getElementById('dashboard');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
             >
               <MapPin className="h-5 w-5 mr-2" />
               Explore Map

@@ -16,6 +16,7 @@ const ReportForm = () => {
     severity: "",
   });
   const [files, setFiles] = useState<FileList | null>(null);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -36,8 +37,62 @@ const ReportForm = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Location Error",
+        description: "Geolocation is not supported by this browser.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoadingLocation(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const locationString = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        handleInputChange("location", locationString);
+        setIsLoadingLocation(false);
+        
+        toast({
+          title: "Location Captured",
+          description: "Current location has been added to your report.",
+        });
+      },
+      (error) => {
+        setIsLoadingLocation(false);
+        let errorMessage = "Unable to retrieve your location.";
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location access denied. Please enable location permissions.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information is unavailable.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out.";
+            break;
+        }
+        
+        toast({
+          title: "Location Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000,
+      }
+    );
+  };
+
   return (
-    <section className="py-16 bg-gradient-subtle">
+    <section id="report-form" className="py-16 bg-gradient-subtle">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           <Card className="shadow-card border-0 bg-card/95 backdrop-blur">
@@ -96,9 +151,11 @@ const ReportForm = () => {
                     variant="outline" 
                     size="sm"
                     className="w-full text-xs"
+                    onClick={getCurrentLocation}
+                    disabled={isLoadingLocation}
                   >
                     <MapPin className="w-3 h-3 mr-1" />
-                    Use Current Location
+                    {isLoadingLocation ? "Getting Location..." : "Use Current Location"}
                   </Button>
                 </div>
 
